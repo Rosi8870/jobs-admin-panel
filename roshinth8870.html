@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="style.css">
 <style>
 /* Clean Admin Styles */
-body { background: var(--bg); color: var(--text); }
+body { background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; }
 .admin-wrapper { max-width: 1200px; margin: 0 auto; padding: 20px var(--gutter); }
 .top-header { text-align: center; padding: 20px 0; }
 .top-header h1 { font-size: 1.8rem; margin: 0; }
@@ -205,7 +205,7 @@ function hideToastAdmin() {
   document.getElementById('toastAdmin').classList.remove('show');
 }
 
-// Jobs List
+// Jobs List - Views & Applies work
 function renderAdminJobs() {
   const jobs = JSON.parse(localStorage.getItem("jobs") || "[]");
   const list = document.getElementById("jobsListAdmin");
@@ -233,8 +233,13 @@ function renderAdminJobs() {
   });
 }
 
-// Chat Management
+// Chat Management - Admin can delete messages
 async function renderChatJobs() {
+  if (!window.firebaseEnabled) {
+    document.getElementById('chatMetrics').innerText = "Firebase not connected";
+    return;
+  }
+
   const jobs = JSON.parse(localStorage.getItem("jobs") || "[]");
   const list = document.getElementById("chatJobsList");
   list.innerHTML = "";
@@ -253,7 +258,7 @@ async function renderChatJobs() {
           <strong>${job.title || 'Untitled Job'}</strong>
           <div style="opacity:0.8;font-size:0.9rem">${msgCount} message${msgCount > 1 ? 's' : ''}</div>
         </div>
-        <button onclick="openChatViewer('${job.id}', '${job.title.replace(/'/g, "\\'")}')" style="padding:8px 14px;border-radius:10px;background:#25D366;border:none;color:white;cursor:pointer">View Chat</button>
+        <button onclick="openChatViewer('${job.id}', '${(job.title || 'Untitled').replace(/'/g, "\\'")}')" style="padding:8px 14px;border-radius:10px;background:#25D366;border:none;color:white;cursor:pointer">View & Manage</button>
       `;
       list.appendChild(row);
     }
@@ -283,18 +288,22 @@ function openChatViewer(jobId, jobTitle) {
       messagesDiv.appendChild(bubble);
     });
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }, err => {
+    showToastAdmin("Failed to load chat");
   });
 }
 
 function deleteChatMessage(jobId, messageId) {
-  if (!confirm("Delete this message?")) return;
+  if (!confirm("Delete this message permanently?")) return;
   firebase.firestore().collection('jobs').doc(jobId).collection('chats').doc(messageId).delete()
     .then(() => showToastAdmin("Message deleted"))
-    .catch(() => showToastAdmin("Delete failed"));
+    .catch(err => {
+      console.error(err);
+      showToastAdmin("Delete failed");
+    });
 }
 
-// Post, Edit, Delete Job - same as before (use previous code)
-
+// Post Job (same as before)
 async function postJob() {
   const raw = jobText.value.trim();
   if (!raw) return showToastAdmin("Enter job details");
@@ -325,9 +334,104 @@ async function postJob() {
   jobText.value = "";
 }
 
-// Edit and Delete - same as before, just add renderChatJobs() after changes
+// Edit Job (same as before)
+async function editJob(idx) {
+  const jobs = JSON.parse(localStorage.getItem("jobs") || "[]");
+  if (idx >= jobs.length) return;
+  const updated = prompt("Edit job (full text):", jobs[idx].raw || '');
+  if (updated === null || !updated.trim()) return;
 
-// Announcement - same as before
+  const raw = updated.trim();
+  const title = raw.split('\n')[0].replace(/^🎯\s*/, '').trim() || 'Untitled';
+  const apply = raw.match(/https?:\/\/\S+/)?.[0] || '';
+  const newJob = { ...jobs[idx], title, raw, apply };
+
+  if (window.firebaseEnabled) {
+    const success = await window.firebaseUpdateJob(newJob);
+    if (success) {
+      showToastAdmin("Job updated & synced");
+      renderAdminJobs();
+      renderChatJobs();
+      return;
+    }
+  }
+
+  jobs[idx] = newJob;
+  localStorage.setItem("jobs", JSON.stringify(jobs));
+  renderAdminJobs();
+  renderChatJobs();
+  showToastAdmin("Job updated (local)");
+}
+
+// Delete Job (same as before)
+async function deleteJob(idx) {
+  if (!confirm("Delete this job permanently?")) return;
+  const jobs = JSON.parse(localStorage.getItem("jobs") || "[]");
+  const deleted = jobs[idx];
+
+  if (window.firebaseEnabled) {
+    const success = await window.firebaseDeleteJob(deleted.id);
+    if (success) {
+      showToastAdmin("Job deleted & synced", 8000, true);
+      localStorage.setItem("lastDeletedJob", JSON.stringify({job: deleted, idx}));
+      renderAdminJobs();
+      renderChatJobs();
+      return;
+    }
+  }
+
+  jobs.splice(idx, 1);
+  localStorage.setItem("jobs", JSON.stringify(jobs));
+  localStorage.setItem("lastDeletedJob", JSON.stringify({job: deleted, idx}));
+  renderAdminJobs();
+  renderChatJobs();
+  showToastAdmin("Job deleted (local)", 8000, true);
+}
+
+function restoreLastDeleted() {
+  const data = localStorage.getItem("lastDeletedJob");
+  if (!data) return showToastAdmin("Nothing to restore");
+  const {job, idx} = JSON.parse(data);
+  const jobs = JSON.parse(localStorage.getItem("jobs") || "[]");
+  jobs.splice(idx, 0, job);
+  localStorage.setItem("jobs", JSON.stringify(jobs));
+  localStorage.removeItem("lastDeletedJob");
+  renderAdminJobs();
+  renderChatJobs();
+  showToastAdmin("Job restored!");
+}
+
+// Announcement
+async function postAnnouncement() {
+  const text = annText.value.trim();
+  if (!text) return showToastAdmin("Enter announcement text");
+
+  if (window.firebaseEnabled) {
+    const success = await window.firebaseSetAnnouncement(text);
+    if (success) showToastAdmin("Announcement posted & synced");
+  } else {
+    localStorage.setItem("announcement", text);
+    showToastAdmin("Announcement saved locally");
+  }
+  annText.value = "";
+  renderAnnouncementAdmin();
+}
+
+function renderAnnouncementAdmin() {
+  const ann = localStorage.getItem("announcement") || "";
+  const el = document.getElementById("currentAnnouncement");
+  if (!ann) {
+    el.innerHTML = "<p style='opacity:0.7'>No active announcement</p>";
+    return;
+  }
+  el.innerHTML = `
+    <div style="padding:16px;background:rgba(255,255,255,0.05);border-radius:12px">${ann}</div>
+    <div style="margin-top:12px;display:flex;gap:10px">
+      <button class="btn-primary-outline" onclick="annText.value='${ann.replace(/'/g, "\\'")}';annText.focus()">Edit</button>
+      <button class="danger" onclick="if(confirm('Delete?')){window.firebaseEnabled?window.firebaseSetAnnouncement(''):localStorage.removeItem('announcement');renderAnnouncementAdmin();showToastAdmin('Deleted')}">Delete</button>
+    </div>
+  `;
+}
 
 // Initial load
 if (localStorage.getItem("admin") === "true") {
