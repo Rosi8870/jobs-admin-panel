@@ -6,537 +6,375 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="style.css">
 <style>
-/* =====================
-   ADMIN STYLES (clean, professional)
-===================== */
-.admin-wrapper{
-  padding:18px var(--gutter);
-  max-width:1200px;
-  margin:0 auto;
-}
+/* Clean Admin Styles - Modern & Consistent */
+body { background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; }
+.admin-wrapper { max-width: 1200px; margin: 0 auto; padding: 20px var(--gutter); }
+.top-header { text-align: center; padding-bottom: 20px; }
+.top-header h1 { font-size: 1.8rem; margin: 0; }
+.top-header p { opacity: 0.8; margin: 8px 0 0; }
 
-.admin-card{
-  width:100%;
-  background:transparent;
-  padding:0;
-}
+.admin-card { background: var(--surface); border-radius: 16px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); margin-bottom: 24px; }
+.admin-card h3 { margin-top: 0; font-size: 1.3rem; }
 
-.admin-layout{ 
-  display:flex; 
-  gap:22px; 
-  align-items:flex-start; 
-}
-
-/* Left list */
-.admin-jobs{
-  flex:1;
-  background:var(--surface);
-  padding:18px;
-  border-radius:10px;
-  max-height: calc(100vh - 160px);
-  overflow-y:auto;
-  box-shadow: 0 10px 30px rgba(2,6,23,0.35);
-}
-
-#jobsListAdmin > div{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:12px;
-  border-radius:8px;
-  margin-bottom:10px;
-  cursor:pointer;
-  transition: background .12s ease, transform .08s ease;
-}
-#jobsListAdmin > div:hover{ 
-  background: rgba(255,255,255,0.03); 
-  transform: translateY(-2px); 
-}
-
-/* Right detail panel */
-.job-detail{ 
-  width:420px; 
-  flex:0 0 420px; 
-  background:var(--surface-2); 
-  padding:18px; 
-  border-radius:10px; 
-  box-shadow: 0 8px 30px rgba(2,6,23,0.18); 
-  max-height: calc(100vh - 160px); 
-  overflow:auto; 
-  position:sticky; 
-  top:20px 
-}
-#detailTitle{ font-weight:700; margin-bottom:8px; }
-#detailRaw{ 
-  white-space:pre-wrap; 
-  color:var(--muted); 
-  background:transparent; 
-  padding:0; 
-  border-radius:6px 
-}
-
-/* Announcement box */
-#currentAnnouncement{ margin-top:12px }
-#currentAnnouncement > div{ 
-  padding:12px; 
-  background:var(--surface); 
-  border-radius:8px; 
-}
-
-/* Inputs & buttons */
-.admin-card input,
-.admin-card textarea{
-  width:100%;
-  margin-top:.8rem;
-  padding:14px 16px;
-  border-radius:16px;
-  background:rgba(255,255,255,.12);
-  border:1px solid var(--border, rgba(255,255,255,0.1));
-  color:white;
-  outline:none;
-  font-family: inherit;
-  font-size: 1rem;
-}
-
-.admin-card button{
-  width:100%;
-  margin-top:1rem;
-  padding:14px;
-  border-radius:14px;
-  background:var(--accent);
-  border:none;
-  color:white;
-  font-weight:600;
-  cursor:pointer;
-  transition: opacity .15s;
-}
-.admin-card button:hover { opacity: 0.9; }
-
-.admin-card .danger{
-  background:#ef4444;
-}
-
-/* Utility buttons */
-.btn{ 
-  display:inline-block; 
-  padding:10px 14px; 
-  border-radius:12px; 
-  font-weight:600; 
-  cursor:pointer; 
-}
-.btn-primary{ background:var(--accent); color:white; border:none; }
-.btn-primary-outline{ 
-  background:transparent; 
-  color:var(--accent); 
-  border:2px solid rgba(10,132,255,0.15); 
-}
-
-/* HR */
-.admin-card hr{ 
-  margin:2rem 0; 
-  opacity:.25; 
-  border:none;
-  height:1px;
+input[type="password"], textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 16px;
   background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: white;
+  font-size: 1rem;
+  margin: 10px 0;
+  box-sizing: border-box;
 }
 
-/* Mobile fallback */
-@media (max-width: 767px){
-  .admin-layout{ flex-direction:column; }
-  .job-detail{ 
-    width:100%; 
-    position:relative; 
-    top:auto; 
-    max-height: none;
-  }
+button {
+  padding: 14px 20px;
+  border-radius: 16px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+button:hover { opacity: 0.9; }
+
+.btn-primary { background: var(--accent); color: white; width: 100%; font-size: 1.1rem; }
+.btn-primary-outline { background: transparent; color: var(--accent); border: 2px solid var(--accent); opacity: 0.8; }
+.danger { background: #ef4444; color: white; }
+
+.admin-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  margin-top: 24px;
+}
+@media (min-width: 900px) {
+  .admin-layout { grid-template-columns: 1fr 420px; }
 }
 
-/* Scrollbars */
-.admin-jobs::-webkit-scrollbar, 
-.job-detail::-webkit-scrollbar { 
-  width:8px; 
+.admin-jobs {
+  background: var(--surface-2);
+  border-radius: 16px;
+  padding: 20px;
+  max-height: 70vh;
+  overflow-y: auto;
 }
-.admin-jobs::-webkit-scrollbar-thumb, 
-.job-detail::-webkit-scrollbar-thumb { 
-  background: rgba(255,255,255,0.1); 
-  border-radius:10px; 
+
+#jobsListAdmin > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  background: rgba(255,255,255,0.03);
+  cursor: pointer;
+  transition: background 0.2s;
 }
+#jobsListAdmin > div:hover { background: rgba(255,255,255,0.08); }
+
+.job-detail {
+  background: var(--surface-2);
+  border-radius: 16px;
+  padding: 20px;
+  height: fit-content;
+  position: sticky;
+  top: 20px;
+}
+#detailRaw { white-space: pre-wrap; background: rgba(0,0,0,0.3); padding: 16px; border-radius: 12px; margin: 12px 0; }
+
+#adminMetrics { font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; }
+
+/* Toast */
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(20,24,28,0.95);
+  color: white;
+  padding: 16px 20px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  z-index: 10000;
+  transform: translateX(120%);
+  transition: transform 0.4s ease;
+}
+.toast.show { transform: translateX(0); }
 </style>
 </head>
-
 <body>
 
 <header class="top-header">
   <h1>Admin Panel</h1>
-  <p>Post jobs & announcements</p>
+  <p>Manage jobs & announcements • Live sync with main site</p>
 </header>
 
 <div class="admin-wrapper">
-
-  <!-- LOGIN -->
   <div class="admin-card" id="loginBox">
     <h3>🔐 Admin Login</h3>
     <input id="password" type="password" placeholder="Enter password">
-    <button onclick="login()">Login</button>
+    <button class="btn-primary" onclick="login()">Login</button>
   </div>
 
-  <!-- PANEL -->
   <div class="admin-card" id="adminBox" style="display:none">
+    <h3>➕ Post New Job</h3>
+    <textarea id="jobText" rows="10" placeholder="🎯 Job Title
+✳️ Role: ...
+❇️ Qualification: ...
+🃏 Experience: ...
+🔔 Date/Location: ...
+👉 Apply Link: https://..."></textarea>
+    <button class="btn-primary" onclick="postJob()">Publish Job</button>
 
-    <h3>➕ Post Job</h3>
-    <textarea id="jobText" rows="8" placeholder="🎯 iOPEX Walkin Drive
-✳️Role: Finance Executive
-❇️Qualification: Any Graduate
-🃏Experience: 1-4 Years
-🔔Date: 19 December
-👉Apply Link: https://example.com"></textarea>
-    <button class="btn btn-primary" onclick="postJob()">Publish Job</button>
-
-    <div class="admin-layout" style="margin-top:1rem">
-      <div id="adminJobs" class="admin-jobs">
+    <div class="admin-layout">
+      <div class="admin-jobs">
         <h3>📋 Existing Jobs</h3>
-        <div id="adminMetrics" style="opacity:.85;margin-bottom:8px"></div>
+        <div id="adminMetrics"></div>
         <div id="jobsListAdmin"></div>
       </div>
 
-      <div id="jobDetailAdmin" class="job-detail" style="display:none">
+      <div class="job-detail" id="jobDetailAdmin" style="display:none">
         <h3 id="detailTitle">Select a job</h3>
-        <pre id="detailRaw" style="white-space:pre-wrap;margin-top:8px;padding:8px;background:rgba(255,255,255,0.03);border-radius:8px;">No job selected</pre>
-        <div id="detailCounts" style="opacity:.85;margin-top:8px"></div>
-        <div style="margin-top:12px;display:flex;gap:8px">
-          <button id="detailEditBtn" onclick="editJob(selectedJobIdx)" style="padding:8px 10px;border-radius:10px;background:#0a84ff;border:none;color:white;cursor:pointer">Edit</button>
-          <button id="detailDeleteBtn" onclick="deleteJob(selectedJobIdx)" style="padding:8px 10px;border-radius:10px;background:#ef4444;border:none;color:white;cursor:pointer">Delete</button>
+        <pre id="detailRaw">No job selected</pre>
+        <div id="detailCounts"></div>
+        <div style="margin-top:20px;display:flex;gap:12px">
+          <button onclick="editJob(selectedJobIdx)" class="btn-primary">Edit</button>
+          <button onclick="deleteJob(selectedJobIdx)" class="danger">Delete</button>
         </div>
       </div>
     </div>
 
-    <hr>  
+    <hr style="margin:32px 0; border:none; border-top:1px solid rgba(255,255,255,0.1)">
 
     <h3>📣 Announcement</h3>
-    <textarea id="annText" rows="3" placeholder="Short announcement message"></textarea>
-    <div style="display:flex;gap:8px;margin-top:8px">
-      <button class="btn btn-primary-outline" onclick="postAnnouncement()">Publish Announcement</button>
-    </div>
+    <textarea id="annText" rows="3" placeholder="Write a short announcement..."></textarea>
+    <button class="btn-primary-outline" onclick="postAnnouncement()">Publish Announcement</button>
+    <div id="currentAnnouncement" style="margin-top:16px"></div>
 
-    <div id="currentAnnouncement" style="margin-top:12px"></div>
-
-    <button class="danger" onclick="logout()">Logout</button>
+    <button class="danger" onclick="logout()" style="margin-top:32px">Logout</button>
   </div>
-
 </div>
 
-<!-- Toast -->
-<div class="toast" id="toastAdmin" style="top:18px;right:18px;position:fixed;z-index:10001;display:flex;align-items:center;gap:8px;">
+<div class="toast" id="toastAdmin">
   <span id="toastTextAdmin"></span>
-  <button id="toastUndoBtn" style="display:none;padding:6px 10px;border-radius:10px;background:#0a84ff;border:none;color:white;cursor:pointer" onclick="restoreLastDeleted()">Undo</button>
+  <button id="toastUndoBtn" style="display:none" onclick="restoreLastDeleted()">Undo</button>
   <button onclick="hideToastAdmin()">✕</button>
-</div> 
+</div>
 
 <script src="firebase-config.js"></script>
 <script src="firebase.js"></script>
 <script>
 const ADMIN_PASSWORD = "change123";
 
-const loginBox = document.getElementById("loginBox");
-const adminBox = document.getElementById("adminBox");
+let selectedJobIdx = null;
+let lastDeleted = null;
 
-function login(){
-  if(password.value === ADMIN_PASSWORD){
-    localStorage.setItem("admin","true");
-    showAdmin();
+function login() {
+  if (password.value === ADMIN_PASSWORD) {
+    localStorage.setItem("admin", "true");
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("adminBox").style.display = "block";
     renderAdminJobs();
-  } else showToastAdmin("Wrong password");
-} 
+    renderAnnouncementAdmin();
+  } else {
+    showToastAdmin("Wrong password");
+  }
+}
 
-function logout(){
+function logout() {
   localStorage.removeItem("admin");
   location.reload();
 }
 
-function showAdmin(){
-  loginBox.style.display="none";
-  adminBox.style.display="block";
+if (localStorage.getItem("admin") === "true") {
+  document.getElementById("loginBox").style.display = "none";
+  document.getElementById("adminBox").style.display = "block";
 }
 
-if(localStorage.getItem("admin")==="true") showAdmin();
-
-// Toast helpers for admin
-let selectedJobIdx = null;
-let lastDeleted = null;
-
-function showToastAdmin(txt, duration = 5000, showUndo = false){
+function showToastAdmin(txt, duration = 5000, showUndo = false) {
   const t = document.getElementById('toastAdmin');
   const tt = document.getElementById('toastTextAdmin');
-  const undoBtn = document.getElementById('toastUndoBtn');
-  if(!t || !tt) return;
-  tt.innerText = txt || '';
-  if(undoBtn) undoBtn.style.display = showUndo ? 'inline-block' : 'none';
+  const undo = document.getElementById('toastUndoBtn');
+  tt.innerText = txt;
+  undo.style.display = showUndo ? 'inline-block' : 'none';
   t.classList.add('show');
-  if(t._hideTimeout) clearTimeout(t._hideTimeout);
-  t._hideTimeout = setTimeout(()=>{ t.classList.remove('show'); t._hideTimeout = null; if(undoBtn) undoBtn.style.display='none'; }, duration);
-}
-function hideToastAdmin(){ 
-  const t = document.getElementById('toastAdmin'); 
-  if(!t) return; 
-  t.classList.remove('show'); 
-  if(t._hideTimeout) clearTimeout(t._hideTimeout); 
-  const undoBtn = document.getElementById('toastUndoBtn'); 
-  if(undoBtn) undoBtn.style.display='none'; 
+  clearTimeout(t._timeout);
+  t._timeout = setTimeout(() => t.classList.remove('show'), duration);
 }
 
-function showJobDetail(idx){
-  const jobs = JSON.parse(localStorage.getItem("jobs")) || [];
-  if(idx < 0 || idx >= jobs.length) return;
-  selectedJobIdx = idx;
-  const j = jobs[idx];
-  const title = document.getElementById('detailTitle');
-  const raw = document.getElementById('detailRaw');
-  const counts = document.getElementById('detailCounts');
-  title.innerText = j.title || 'Job detail';
-  raw.innerText = j.raw || '';
-  counts.innerText = `👁️ Views: ${j.views || 0} • 🔗 Applies: ${j.applies || 0}`;
-  document.getElementById('jobDetailAdmin').style.display = 'block';
+function hideToastAdmin() {
+  document.getElementById('toastAdmin').classList.remove('show');
 }
 
-function restoreLastDeleted(){
-  try{
-    const raw = localStorage.getItem('lastDeletedJob');
-    if(!raw) return showToastAdmin('Nothing to restore');
-    const item = JSON.parse(raw);
-    const jobs = JSON.parse(localStorage.getItem("jobs")) || [];
-    const idx = Math.min(item.idx, jobs.length);
-    jobs.splice(idx,0,item.job);
-    localStorage.setItem("jobs", JSON.stringify(jobs));
-    localStorage.removeItem('lastDeletedJob');
-    lastDeleted = null;
-    renderAdminJobs();
-    showToastAdmin('Job restored');
-  }catch(e){ console.error(e); showToastAdmin('Unable to restore'); }
-}
-
-// React to changes from other tabs / Firebase
-window.addEventListener('storage', e => {
-  if(e.key === 'announcement'){
-    showToastAdmin(e.newValue || 'Announcement posted');
-    renderAnnouncementAdmin();
-  }
-  if(e.key === 'jobs'){
-    renderAdminJobs();
-  }
-  if(e.key === 'lastDeletedJob'){
-    lastDeleted = localStorage.getItem('lastDeletedJob') ? JSON.parse(localStorage.getItem('lastDeletedJob')) : null;
-  }
-});
-
-function renderAnnouncementAdmin(){
-  const el = document.getElementById('currentAnnouncement');
-  if(!el) return;
-  const ann = localStorage.getItem('announcement') || '';
-  if(!ann){ 
-    el.innerHTML = "<p style='opacity:.7'>No announcement</p>"; 
-    return; 
-  }
-  el.innerHTML = `<div style="padding:10px;background:rgba(255,255,255,0.02);border-radius:8px;white-space:pre-wrap">${ann}</div>
-  <div style="margin-top:8px;display:flex;gap:8px">
-    <button class="btn btn-primary-outline" onclick="editAnnouncement()">Edit</button>
-    <button onclick="deleteAnnouncement()" style="padding:8px 10px;border-radius:10px;background:#ef4444;border:none;color:white;cursor:pointer">Delete</button>
-  </div>`;
-}
-
-function editAnnouncement(){
-  const ann = localStorage.getItem('announcement') || '';
-  annText.value = ann;
-  annText.focus();
-}
-
-async function deleteAnnouncement(){
-  if(!confirm('Delete announcement?')) return;
-  if(window.firebaseEnabled){
-    const success = await window.firebaseSetAnnouncement('');
-    if(success) showToastAdmin('Announcement deleted');
-    else showToastAdmin('Error deleting announcement');
-  } else {
-    localStorage.removeItem('announcement');
-    showToastAdmin('Announcement deleted (local)');
-  }
-  renderAnnouncementAdmin();
-}
-
-if(localStorage.getItem("admin")==="true") renderAnnouncementAdmin();
-
-/* JOB POST */
-async function postJob(){
-  try{
-    const raw = (jobText.value || "").trim();
-    if(!raw) return showToastAdmin("Please enter job details");
-
-    const firstLine = raw.split('\n')[0].replace(/^🎯\s*/,'').trim();
-    const title = firstLine || 'Untitled Job';
-    const urlMatch = raw.match(/https?:\/\/\S+/i);
-    const id = 'job_' + Date.now();
-    const job = {
-      id,
-      title,
-      raw,
-      apply: urlMatch ? urlMatch[0] : '',
-      views: 0,
-      applies: 0,
-      createdAt: Date.now()
-    };
-
-    if(window.firebaseEnabled){
-      const success = await window.firebasePushJob(job);
-      if(success){
-        showToastAdmin("Job posted and synced");
-        jobText.value="";
-        return; // Firebase listener will update UI
-      } else {
-        showToastAdmin("Firebase error – falling back to local");
-      }
-    }
-
-    // Local fallback
-    const jobs = JSON.parse(localStorage.getItem("jobs")) || [];
-    jobs.unshift(job);
-    localStorage.setItem("jobs", JSON.stringify(jobs));
-    renderAdminJobs();
-    showToastAdmin("Job posted (local only)");
-    jobText.value="";
-  }catch(e){
-    console.error(e);
-    showToastAdmin("Error posting job");
-  }
-} 
-
-/* ANNOUNCEMENT */
-async function postAnnouncement(){
-  const txt = (annText.value || '').trim();
-  if(!txt) return showToastAdmin('Please enter announcement');
-
-  if(window.firebaseEnabled){
-    const success = await window.firebaseSetAnnouncement(txt);
-    if(success){
-      showToastAdmin("Announcement posted and synced");
-      annText.value="";
-      renderAnnouncementAdmin();
-      return;
-    } else {
-      showToastAdmin("Firebase error – falling back to local");
-    }
-  }
-
-  localStorage.setItem("announcement", txt);
-  showToastAdmin("Announcement posted (local only)");
-  annText.value="";
-  renderAnnouncementAdmin();
-} 
-
-/* ADMIN JOBS LIST */
-function renderAdminJobs(){
-  const jobs = JSON.parse(localStorage.getItem("jobs")) || [];
+function renderAdminJobs() {
+  const jobs = JSON.parse(localStorage.getItem("jobs") || "[]");
   const list = document.getElementById("jobsListAdmin");
-  if(!list) return;
-  list.innerHTML = "";
-  if(jobs.length === 0){
-    list.innerHTML = "<p style='opacity:.7'>No jobs posted</p>";
-    return;
-  }
+  list.innerHTML = jobs.length === 0 ? "<p style='opacity:0.7;text-align:center;padding:40px'>No jobs posted yet</p>" : "";
 
-  const metricsEl = document.getElementById('adminMetrics');
-  if(metricsEl){
-    const totalViews = jobs.reduce((s,j)=>s+(j.views||0),0);
-    const totalApplies = jobs.reduce((s,j)=>s+(j.applies||0),0);
-    metricsEl.innerText = `Total Views: ${totalViews} • Total Applies: ${totalApplies}`;
-  }
+  const totalViews = jobs.reduce((sum, j) => sum + (j.views || 0), 0);
+  const totalApplies = jobs.reduce((sum, j) => sum + (j.applies || 0), 0);
+  document.getElementById('adminMetrics').innerText = `Total Views: ${totalViews} • Total Applies: ${totalApplies}`;
 
   jobs.forEach((job, idx) => {
+    const excerpt = (job.raw || "").split('\n').slice(1,3).join(' ') || "No preview";
     const row = document.createElement("div");
-    const lines = (job.raw||"").split('\n').map(l=>l.trim()).filter(Boolean);
-    const excerpt = lines[1] ? lines[1] : (lines[0] && lines[0].length>60 ? lines[0].slice(0,60)+'...' : lines[0]||'');
-    row.innerHTML = `<div>
-        <strong>${job.title}</strong>
-        <div style="opacity:.85;font-size:.9rem">${excerpt}</div>
-        <div style="opacity:.7;font-size:.85rem;margin-top:6px">👁️ ${job.views||0} • 🔗 ${job.applies||0}</div>
+    row.innerHTML = `
+      <div>
+        <strong>${job.title || 'Untitled'}</strong>
+        <div style="opacity:0.8;font-size:0.95rem;margin:6px 0">${excerpt}</div>
+        <div style="opacity:0.7;font-size:0.9rem">👁️ ${job.views || 0} views • 🔗 ${job.applies || 0} applies</div>
       </div>
-      <div style="display:flex;gap:8px">
-        <button onclick="event.stopPropagation(); editJob(${idx})" style="padding:8px 10px;border-radius:10px;background:#0a84ff;border:none;color:white;cursor:pointer">Edit</button>
-        <button onclick="event.stopPropagation(); deleteJob(${idx})" style="padding:8px 10px;border-radius:10px;background:#ef4444;border:none;color:white;cursor:pointer">Delete</button>
-      </div>`;
-    row.onclick = () => showJobDetail(idx);
+      <div style="display:flex;gap:10px">
+        <button onclick="event.stopPropagation(); editJob(${idx})">Edit</button>
+        <button onclick="event.stopPropagation(); deleteJob(${idx})" style="background:#ef4444">Delete</button>
+      </div>
+    `;
+    row.onclick = () => {
+      selectedJobIdx = idx;
+      document.getElementById('detailTitle').innerText = job.title || 'Untitled';
+      document.getElementById('detailRaw').innerText = job.raw || '';
+      document.getElementById('detailCounts').innerText = `Views: ${job.views || 0} • Applies: ${job.applies || 0}`;
+      document.getElementById('jobDetailAdmin').style.display = 'block';
+    };
     list.appendChild(row);
   });
 }
 
-async function deleteJob(idx){
-  if(!confirm("Delete this job?")) return;
-  const jobs = JSON.parse(localStorage.getItem("jobs")) || [];
-  if(idx < 0 || idx >= jobs.length) return;
-  const deleted = jobs[idx];
-  const jobId = deleted.id;
+async function postJob() {
+  const raw = jobText.value.trim();
+  if (!raw) return showToastAdmin("Enter job details");
 
-  if(window.firebaseEnabled){
-    const success = await window.firebaseDeleteJob(jobId);
-    if(success){
-      showToastAdmin("Job deleted and synced", 8000, true);
-      localStorage.setItem('lastDeletedJob', JSON.stringify({ job: deleted, idx, time: Date.now() }));
-      lastDeleted = { job: deleted, idx };
-      if(selectedJobIdx === idx){ document.getElementById('jobDetailAdmin').style.display = 'none'; selectedJobIdx = null; }
-      return; // Listener will refresh list
-    } else {
-      showToastAdmin("Firebase delete error – falling back to local");
-    }
-  }
+  const title = raw.split('\n')[0].replace(/^🎯\s*/, '').trim() || 'Untitled Job';
+  const apply = raw.match(/https?:\/\/\S+/)?.[0] || '';
+  const id = 'job_' + Date.now();
 
-  // Local fallback
-  jobs.splice(idx,1);
-  localStorage.setItem("jobs", JSON.stringify(jobs));
-  localStorage.setItem('lastDeletedJob', JSON.stringify({ job: deleted, idx, time: Date.now() }));
-  lastDeleted = { job: deleted, idx };
-  renderAdminJobs();
-  showToastAdmin("Job deleted (local only)", 8000, true);
-  if(selectedJobIdx === idx){ document.getElementById('jobDetailAdmin').style.display = 'none'; selectedJobIdx = null; }
-}
+  const job = { id, title, raw, apply, views: 0, applies: 0, createdAt: Date.now() };
 
-async function editJob(idx){
-  const jobs = JSON.parse(localStorage.getItem("jobs")) || [];
-  if(idx < 0 || idx >= jobs.length) return;
-  const current = jobs[idx].raw || jobs[idx].title || '';
-  const updated = prompt("Edit job text (full text):", current);
-  if(updated === null) return;
-  const raw = updated.trim();
-  if(!raw) return showToastAdmin("Job text cannot be empty");
-  const firstLine = (raw.split('\n')[0] || "").replace(/^🎯\s*/,'').trim();
-  const title = firstLine || 'Untitled Job';
-  const urlMatch = raw.match(/https?:\/\/\S+/i);
-  const updatedJob = { ...jobs[idx], title, raw, apply: urlMatch ? urlMatch[0] : '' };
-
-  if(window.firebaseEnabled){
-    const success = await window.firebaseUpdateJob(updatedJob);
-    if(success){
-      showToastAdmin("Job updated and synced");
-      showJobDetail(idx);
+  if (window.firebaseEnabled) {
+    const ok = await window.firebasePushJob(job);
+    if (ok) {
+      showToastAdmin("Job posted & synced!");
+      jobText.value = "";
       return;
-    } else {
-      showToastAdmin("Firebase update error – falling back to local");
     }
   }
 
-  jobs[idx] = updatedJob;
+  const jobs = JSON.parse(localStorage.getItem("jobs") || "[]");
+  jobs.unshift(job);
   localStorage.setItem("jobs", JSON.stringify(jobs));
   renderAdminJobs();
-  showJobDetail(idx);
-  showToastAdmin("Job updated (local only)");
+  showToastAdmin("Job posted (local)");
+  jobText.value = "";
 }
 
-// Initial render
-if(localStorage.getItem("admin")==="true") renderAdminJobs();
+async function editJob(idx) {
+  const jobs = JSON.parse(localStorage.getItem("jobs") || "[]");
+  if (idx >= jobs.length) return;
+  const updated = prompt("Edit job (full text):", jobs[idx].raw || '');
+  if (updated === null || !updated.trim()) return;
 
-// Expose functions for firebase.js listeners
+  const raw = updated.trim();
+  const title = raw.split('\n')[0].replace(/^🎯\s*/, '').trim() || 'Untitled';
+  const apply = raw.match(/https?:\/\/\S+/)?.[0] || '';
+
+  const newJob = { ...jobs[idx], title, raw, apply };
+
+  if (window.firebaseEnabled) {
+    const ok = await window.firebaseUpdateJob(newJob);
+    if (ok) {
+      showToastAdmin("Job updated & synced");
+      renderAdminJobs();
+      if (selectedJobIdx === idx) showJobDetail(idx);
+      return;
+    }
+  }
+
+  jobs[idx] = newJob;
+  localStorage.setItem("jobs", JSON.stringify(jobs));
+  renderAdminJobs();
+  if (selectedJobIdx === idx) showJobDetail(idx);
+  showToastAdmin("Job updated (local)");
+}
+
+async function deleteJob(idx) {
+  if (!confirm("Delete this job permanently?")) return;
+  const jobs = JSON.parse(localStorage.getItem("jobs") || "[]");
+  const deleted = jobs[idx];
+
+  if (window.firebaseEnabled) {
+    const ok = await window.firebaseDeleteJob(deleted.id);
+    if (ok) {
+      showToastAdmin("Job deleted & synced", 8000, true);
+      localStorage.setItem("lastDeletedJob", JSON.stringify({job: deleted, idx}));
+      renderAdminJobs();
+      return;
+    }
+  }
+
+  jobs.splice(idx, 1);
+  localStorage.setItem("jobs", JSON.stringify(jobs));
+  localStorage.setItem("lastDeletedJob", JSON.stringify({job: deleted, idx}));
+  renderAdminJobs();
+  showToastAdmin("Job deleted (local)", 8000, true);
+}
+
+function restoreLastDeleted() {
+  const data = localStorage.getItem("lastDeletedJob");
+  if (!data) return showToastAdmin("Nothing to restore");
+  const {job, idx} = JSON.parse(data);
+  const jobs = JSON.parse(localStorage.getItem("jobs") || "[]");
+  jobs.splice(idx, 0, job);
+  localStorage.setItem("jobs", JSON.stringify(jobs));
+  localStorage.removeItem("lastDeletedJob");
+  renderAdminJobs();
+  showToastAdmin("Job restored!");
+}
+
+async function postAnnouncement() {
+  const text = annText.value.trim();
+  if (!text) return showToastAdmin("Enter announcement text");
+
+  if (window.firebaseEnabled) {
+    const ok = await window.firebaseSetAnnouncement(text);
+    if (ok) showToastAdmin("Announcement posted & synced");
+    else showToastAdmin("Sync failed - saved locally");
+  } else {
+    localStorage.setItem("announcement", text);
+    showToastAdmin("Announcement saved locally");
+  }
+  annText.value = "";
+  renderAnnouncementAdmin();
+}
+
+function renderAnnouncementAdmin() {
+  const ann = localStorage.getItem("announcement") || "";
+  const el = document.getElementById("currentAnnouncement");
+  if (!ann) {
+    el.innerHTML = "<p style='opacity:0.7'>No active announcement</p>";
+    return;
+  }
+  el.innerHTML = `
+    <div style="padding:16px;background:rgba(255,255,255,0.05);border-radius:12px;white-space:pre-wrap">${ann}</div>
+    <div style="margin-top:12px;display:flex;gap:10px">
+      <button class="btn-primary-outline" onclick="annText.value='${ann.replace(/'/g, "\\'")}';annText.focus()">Edit</button>
+      <button class="danger" onclick="if(confirm('Delete announcement?')){window.firebaseEnabled?window.firebaseSetAnnouncement(''):localStorage.removeItem('announcement');renderAnnouncementAdmin();showToastAdmin('Deleted')}">Delete</button>
+    </div>
+  `;
+}
+
+// Initial load
+if (localStorage.getItem("admin") === "true") {
+  renderAdminJobs();
+  renderAnnouncementAdmin();
+}
+
+// Expose for firebase.js sync
 window.renderAdminJobs = renderAdminJobs;
 window.renderAnnouncementAdmin = renderAnnouncementAdmin;
 window.showToastAdmin = showToastAdmin;
-
 </script>
-
 </body>
 </html>
