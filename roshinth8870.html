@@ -204,7 +204,7 @@ function hideToastAdmin() {
   document.getElementById('toastAdmin').classList.remove('show');
 }
 
-// Jobs List - Views & Applies work
+// Jobs List
 function renderAdminJobs() {
   const jobs = JSON.parse(localStorage.getItem("jobs") || "[]");
   const list = document.getElementById("jobsListAdmin");
@@ -232,16 +232,17 @@ function renderAdminJobs() {
   });
 }
 
-// Chat Management - Robust connection check
+// Chat Management - Robust with retry
 async function renderChatJobs() {
   const list = document.getElementById("chatJobsList");
   const metrics = document.getElementById("chatMetrics");
 
-  const isConnected = typeof firebase !== 'undefined' && firebase.apps.length > 0;
+  const isConnected = typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length > 0;
 
   if (!isConnected) {
-    metrics.innerText = "Firebase not connected";
-    list.innerHTML = "<p style='opacity:0.7;text-align:center;padding:40px'>Firebase connection required for chat management</p>";
+    metrics.innerText = "Firebase loading...";
+    list.innerHTML = "<p style='opacity:0.7;text-align:center;padding:40px'>Waiting for Firebase connection...</p>";
+    setTimeout(renderChatJobs, 2000);
     return;
   }
 
@@ -269,7 +270,7 @@ async function renderChatJobs() {
         list.appendChild(row);
       }
     } catch (err) {
-      console.error("Error loading chat for job:", job.id, err);
+      console.error("Error loading chat:", err);
     }
   }
 
@@ -297,8 +298,6 @@ function openChatViewer(jobId, jobTitle) {
       messagesDiv.appendChild(bubble);
     });
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
-  }, err => {
-    showToastAdmin("Failed to load chat");
   });
 }
 
@@ -309,10 +308,7 @@ function deleteChatMessage(jobId, messageId) {
       showToastAdmin("Message deleted");
       renderChatJobs(); // Refresh counts
     })
-    .catch(err => {
-      console.error(err);
-      showToastAdmin("Delete failed");
-    });
+    .catch(() => showToastAdmin("Delete failed"));
 }
 
 // Post Job
@@ -445,15 +441,14 @@ function renderAnnouncementAdmin() {
   `;
 }
 
-// Initial load
-if (localStorage.getItem("admin") === "true") {
-  renderAdminJobs();
-  renderChatJobs();
-  renderAnnouncementAdmin();
-}
-
-// Re-render chat jobs after delete
-window.renderChatJobs = renderChatJobs;
+// Initial load with delay for Vercel/Firebase init
+window.addEventListener('load', () => {
+  if (localStorage.getItem("admin") === "true") {
+    renderAdminJobs();
+    renderAnnouncementAdmin();
+    setTimeout(renderChatJobs, 2000); // Wait for Firebase config injection
+  }
+});
 
 // Expose for firebase.js
 window.renderAdminJobs = renderAdminJobs;
