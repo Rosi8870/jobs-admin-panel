@@ -445,5 +445,17 @@ window.renderAdminJobs = renderAdminJobs;
 window.renderAnnouncementAdmin = renderAnnouncementAdmin;
 window.showToastAdmin = showToastAdmin;
 </script>
+  <script>
+// Force Firebase initialization in admin panel
+window.addEventListener('load', () => {
+  if (typeof firebase !== 'undefined' && !window.firebaseEnabled) {
+    // Re-init if not enabled
+    setTimeout(() => {
+      renderChatJobs(); // Re-try chat loading
+    }, 2000);
+  }
+});
+</script>
 </body>
 </html>
+
