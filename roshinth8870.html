@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="style.css">
 <style>
-/* Clean & Modern Admin Styles */
+/* Clean Admin Styles */
 body { background: var(--bg); color: var(--text); }
 .admin-wrapper { max-width: 1200px; margin: 0 auto; padding: 20px var(--gutter); }
 .top-header { text-align: center; padding: 20px 0; }
@@ -50,7 +50,6 @@ button:hover { opacity: 0.9; }
   border-radius: 12px;
   margin-bottom: 12px;
   background: rgba(255,255,255,0.03);
-  cursor: default;
 }
 #jobsListAdmin > div:hover { background: rgba(255,255,255,0.08); }
 
@@ -74,17 +73,17 @@ button:hover { opacity: 0.9; }
 }
 .toast.show { transform: translateX(0); }
 
-/* Chat message delete button (admin only) */
-.chat-delete {
+/* Admin chat delete button */
+.chat-admin-delete {
   background: none;
   border: none;
   color: #ef4444;
   font-size: 20px;
   cursor: pointer;
-  margin-left: auto;
+  margin-left: 8px;
   opacity: 0.7;
 }
-.chat-delete:hover { opacity: 1; }
+.chat-admin-delete:hover { opacity: 1; }
 </style>
 </head>
 <body>
@@ -176,7 +175,7 @@ function hideToastAdmin() {
   document.getElementById('toastAdmin').classList.remove('show');
 }
 
-// Render jobs with live views/applies
+// Render jobs with real views/applies from Firestore sync
 function renderAdminJobs() {
   const jobs = JSON.parse(localStorage.getItem("jobs") || "[]");
   const list = document.getElementById("jobsListAdmin");
