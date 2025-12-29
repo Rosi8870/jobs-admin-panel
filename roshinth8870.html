@@ -6,25 +6,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="style.css">
 <style>
-/* Clean Admin Styles - Modern & Consistent */
-body { background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; }
+/* Clean & Modern Admin Styles */
+body { background: var(--bg); color: var(--text); }
 .admin-wrapper { max-width: 1200px; margin: 0 auto; padding: 20px var(--gutter); }
-.top-header { text-align: center; padding-bottom: 20px; }
+.top-header { text-align: center; padding: 20px 0; }
 .top-header h1 { font-size: 1.8rem; margin: 0; }
 .top-header p { opacity: 0.8; margin: 8px 0 0; }
 
 .admin-card { background: var(--surface); border-radius: 16px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); margin-bottom: 24px; }
 .admin-card h3 { margin-top: 0; font-size: 1.3rem; }
 
-input[type="password"], textarea {
+textarea, input[type="password"] {
   width: 100%;
-  padding: 14px 16px;
+  padding: 16px;
   border-radius: 16px;
   background: rgba(255,255,255,0.1);
   border: 1px solid rgba(255,255,255,0.2);
   color: white;
   font-size: 1rem;
-  margin: 10px 0;
+  margin: 12px 0;
   box-sizing: border-box;
 }
 
@@ -38,27 +38,9 @@ button {
 }
 button:hover { opacity: 0.9; }
 
-.btn-primary { background: var(--accent); color: white; width: 100%; font-size: 1.1rem; }
-.btn-primary-outline { background: transparent; color: var(--accent); border: 2px solid var(--accent); opacity: 0.8; }
+.btn-primary { background: var(--accent); color: white; width: 100%; font-size: 1.1rem; margin-top: 8px; }
+.btn-primary-outline { background: transparent; color: var(--accent); border: 2px solid var(--accent); }
 .danger { background: #ef4444; color: white; }
-
-.admin-layout {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 24px;
-  margin-top: 24px;
-}
-@media (min-width: 900px) {
-  .admin-layout { grid-template-columns: 1fr 420px; }
-}
-
-.admin-jobs {
-  background: var(--surface-2);
-  border-radius: 16px;
-  padding: 20px;
-  max-height: 70vh;
-  overflow-y: auto;
-}
 
 #jobsListAdmin > div {
   display: flex;
@@ -68,24 +50,12 @@ button:hover { opacity: 0.9; }
   border-radius: 12px;
   margin-bottom: 12px;
   background: rgba(255,255,255,0.03);
-  cursor: pointer;
-  transition: background 0.2s;
+  cursor: default;
 }
 #jobsListAdmin > div:hover { background: rgba(255,255,255,0.08); }
 
-.job-detail {
-  background: var(--surface-2);
-  border-radius: 16px;
-  padding: 20px;
-  height: fit-content;
-  position: sticky;
-  top: 20px;
-}
-#detailRaw { white-space: pre-wrap; background: rgba(0,0,0,0.3); padding: 16px; border-radius: 12px; margin: 12px 0; }
+#adminMetrics { font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; opacity: 0.9; }
 
-#adminMetrics { font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; }
-
-/* Toast */
 .toast {
   position: fixed;
   top: 20px;
@@ -103,13 +73,25 @@ button:hover { opacity: 0.9; }
   transition: transform 0.4s ease;
 }
 .toast.show { transform: translateX(0); }
+
+/* Chat message delete button (admin only) */
+.chat-delete {
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-size: 20px;
+  cursor: pointer;
+  margin-left: auto;
+  opacity: 0.7;
+}
+.chat-delete:hover { opacity: 1; }
 </style>
 </head>
 <body>
 
 <header class="top-header">
   <h1>Admin Panel</h1>
-  <p>Manage jobs & announcements • Live sync with main site</p>
+  <p>Manage jobs, announcements & chat</p>
 </header>
 
 <div class="admin-wrapper">
@@ -129,28 +111,14 @@ button:hover { opacity: 0.9; }
 👉 Apply Link: https://..."></textarea>
     <button class="btn-primary" onclick="postJob()">Publish Job</button>
 
-    <div class="admin-layout">
-      <div class="admin-jobs">
-        <h3>📋 Existing Jobs</h3>
-        <div id="adminMetrics"></div>
-        <div id="jobsListAdmin"></div>
-      </div>
-
-      <div class="job-detail" id="jobDetailAdmin" style="display:none">
-        <h3 id="detailTitle">Select a job</h3>
-        <pre id="detailRaw">No job selected</pre>
-        <div id="detailCounts"></div>
-        <div style="margin-top:20px;display:flex;gap:12px">
-          <button onclick="editJob(selectedJobIdx)" class="btn-primary">Edit</button>
-          <button onclick="deleteJob(selectedJobIdx)" class="danger">Delete</button>
-        </div>
-      </div>
-    </div>
+    <h3 style="margin-top:32px">📋 Existing Jobs</h3>
+    <div id="adminMetrics"></div>
+    <div id="jobsListAdmin"></div>
 
     <hr style="margin:32px 0; border:none; border-top:1px solid rgba(255,255,255,0.1)">
 
     <h3>📣 Announcement</h3>
-    <textarea id="annText" rows="3" placeholder="Write a short announcement..."></textarea>
+    <textarea id="annText" rows="3" placeholder="Write announcement..."></textarea>
     <button class="btn-primary-outline" onclick="postAnnouncement()">Publish Announcement</button>
     <div id="currentAnnouncement" style="margin-top:16px"></div>
 
@@ -169,7 +137,6 @@ button:hover { opacity: 0.9; }
 <script>
 const ADMIN_PASSWORD = "change123";
 
-let selectedJobIdx = null;
 let lastDeleted = null;
 
 function login() {
@@ -209,36 +176,30 @@ function hideToastAdmin() {
   document.getElementById('toastAdmin').classList.remove('show');
 }
 
+// Render jobs with live views/applies
 function renderAdminJobs() {
   const jobs = JSON.parse(localStorage.getItem("jobs") || "[]");
   const list = document.getElementById("jobsListAdmin");
-  list.innerHTML = jobs.length === 0 ? "<p style='opacity:0.7;text-align:center;padding:40px'>No jobs posted yet</p>" : "";
+  list.innerHTML = jobs.length === 0 ? "<p style='opacity:0.7;text-align:center;padding:40px'>No jobs posted</p>" : "";
 
-  const totalViews = jobs.reduce((sum, j) => sum + (j.views || 0), 0);
-  const totalApplies = jobs.reduce((sum, j) => sum + (j.applies || 0), 0);
+  const totalViews = jobs.reduce((s, j) => s + (j.views || 0), 0);
+  const totalApplies = jobs.reduce((s, j) => s + (j.applies || 0), 0);
   document.getElementById('adminMetrics').innerText = `Total Views: ${totalViews} • Total Applies: ${totalApplies}`;
 
   jobs.forEach((job, idx) => {
-    const excerpt = (job.raw || "").split('\n').slice(1,3).join(' ') || "No preview";
+    const excerpt = (job.raw || "").split('\n')[1] || (job.raw || "").split('\n')[0]?.slice(0,60) + '...';
     const row = document.createElement("div");
     row.innerHTML = `
       <div>
         <strong>${job.title || 'Untitled'}</strong>
-        <div style="opacity:0.8;font-size:0.95rem;margin:6px 0">${excerpt}</div>
+        <div style="opacity:0.85;font-size:0.95rem;margin:6px 0">${excerpt || 'No preview'}</div>
         <div style="opacity:0.7;font-size:0.9rem">👁️ ${job.views || 0} views • 🔗 ${job.applies || 0} applies</div>
       </div>
       <div style="display:flex;gap:10px">
-        <button onclick="event.stopPropagation(); editJob(${idx})">Edit</button>
-        <button onclick="event.stopPropagation(); deleteJob(${idx})" style="background:#ef4444">Delete</button>
+        <button onclick="event.stopPropagation(); editJob(${idx})" style="padding:8px 14px;border-radius:10px;background:#0a84ff;border:none;color:white;cursor:pointer">Edit</button>
+        <button onclick="event.stopPropagation(); deleteJob(${idx})" style="padding:8px 14px;border-radius:10px;background:#ef4444;border:none;color:white;cursor:pointer">Delete</button>
       </div>
     `;
-    row.onclick = () => {
-      selectedJobIdx = idx;
-      document.getElementById('detailTitle').innerText = job.title || 'Untitled';
-      document.getElementById('detailRaw').innerText = job.raw || '';
-      document.getElementById('detailCounts').innerText = `Views: ${job.views || 0} • Applies: ${job.applies || 0}`;
-      document.getElementById('jobDetailAdmin').style.display = 'block';
-    };
     list.appendChild(row);
   });
 }
@@ -254,9 +215,9 @@ async function postJob() {
   const job = { id, title, raw, apply, views: 0, applies: 0, createdAt: Date.now() };
 
   if (window.firebaseEnabled) {
-    const ok = await window.firebasePushJob(job);
-    if (ok) {
-      showToastAdmin("Job posted & synced!");
+    const success = await window.firebasePushJob(job);
+    if (success) {
+      showToastAdmin("Job posted & synced");
       jobText.value = "";
       return;
     }
@@ -279,15 +240,13 @@ async function editJob(idx) {
   const raw = updated.trim();
   const title = raw.split('\n')[0].replace(/^🎯\s*/, '').trim() || 'Untitled';
   const apply = raw.match(/https?:\/\/\S+/)?.[0] || '';
-
   const newJob = { ...jobs[idx], title, raw, apply };
 
   if (window.firebaseEnabled) {
-    const ok = await window.firebaseUpdateJob(newJob);
-    if (ok) {
+    const success = await window.firebaseUpdateJob(newJob);
+    if (success) {
       showToastAdmin("Job updated & synced");
       renderAdminJobs();
-      if (selectedJobIdx === idx) showJobDetail(idx);
       return;
     }
   }
@@ -295,7 +254,6 @@ async function editJob(idx) {
   jobs[idx] = newJob;
   localStorage.setItem("jobs", JSON.stringify(jobs));
   renderAdminJobs();
-  if (selectedJobIdx === idx) showJobDetail(idx);
   showToastAdmin("Job updated (local)");
 }
 
@@ -305,8 +263,8 @@ async function deleteJob(idx) {
   const deleted = jobs[idx];
 
   if (window.firebaseEnabled) {
-    const ok = await window.firebaseDeleteJob(deleted.id);
-    if (ok) {
+    const success = await window.firebaseDeleteJob(deleted.id);
+    if (success) {
       showToastAdmin("Job deleted & synced", 8000, true);
       localStorage.setItem("lastDeletedJob", JSON.stringify({job: deleted, idx}));
       renderAdminJobs();
@@ -338,9 +296,8 @@ async function postAnnouncement() {
   if (!text) return showToastAdmin("Enter announcement text");
 
   if (window.firebaseEnabled) {
-    const ok = await window.firebaseSetAnnouncement(text);
-    if (ok) showToastAdmin("Announcement posted & synced");
-    else showToastAdmin("Sync failed - saved locally");
+    const success = await window.firebaseSetAnnouncement(text);
+    if (success) showToastAdmin("Announcement posted & synced");
   } else {
     localStorage.setItem("announcement", text);
     showToastAdmin("Announcement saved locally");
@@ -357,10 +314,10 @@ function renderAnnouncementAdmin() {
     return;
   }
   el.innerHTML = `
-    <div style="padding:16px;background:rgba(255,255,255,0.05);border-radius:12px;white-space:pre-wrap">${ann}</div>
+    <div style="padding:16px;background:rgba(255,255,255,0.05);border-radius:12px">${ann}</div>
     <div style="margin-top:12px;display:flex;gap:10px">
       <button class="btn-primary-outline" onclick="annText.value='${ann.replace(/'/g, "\\'")}';annText.focus()">Edit</button>
-      <button class="danger" onclick="if(confirm('Delete announcement?')){window.firebaseEnabled?window.firebaseSetAnnouncement(''):localStorage.removeItem('announcement');renderAnnouncementAdmin();showToastAdmin('Deleted')}">Delete</button>
+      <button class="danger" onclick="if(confirm('Delete?')){window.firebaseEnabled?window.firebaseSetAnnouncement(''):localStorage.removeItem('announcement');renderAnnouncementAdmin();showToastAdmin('Deleted')}">Delete</button>
     </div>
   `;
 }
@@ -371,7 +328,7 @@ if (localStorage.getItem("admin") === "true") {
   renderAnnouncementAdmin();
 }
 
-// Expose for firebase.js sync
+// Expose for firebase.js
 window.renderAdminJobs = renderAdminJobs;
 window.renderAnnouncementAdmin = renderAnnouncementAdmin;
 window.showToastAdmin = showToastAdmin;
